@@ -27,6 +27,7 @@ for row in itemsMango:
         if box.table: 
             box = box.table
             title = box.findAll('span', {'id':re.compile('.*iteradorPrendas:\d+:.*'),'class':'txt7'})[0].text
-            print title
+            price = box.findAll('span', {'class':re.compile('txt8B|txt7'), 'id':None})
+            print price
             print "$$$$$$"
             
