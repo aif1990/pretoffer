@@ -1,28 +1,32 @@
 import urllib2
 import re
 import json
-#import BeautifulSoup
+import BeautifulSoup
         
-site = urllib2.urlopen('http://www.zara.com/webapp/wcs/stores/servlet/category/uk/en/zara-W2011-r/178003/Collection')
+siteZara = urllib2.urlopen('http://www.zara.com/webapp/wcs/stores/servlet/category/uk/en/zara-W2011-r/178003/Collection')
 
-#site = BeautifulSoup.BeautifulSoup(site)
+itemsZara = re.search('categoryData: {"items":(.*\]),',siteZara.read()).groups()
 
-#scripts = site.findAll('script')
+itemsZara = json.loads(itemsZara[0])
 
-items = re.search('categoryData: {"items":(.*\]),',site.read()).groups()
-
-items = json.loads(items[0])
-
-for item in items:
+for item in itemsZara:
     print json.dumps(item, sort_keys=True, indent=4)
     print "---------"
 
-#for script in scripts:
- #   script = str(script)
-  #  if script.find('categoryData') != (-1):
-   #     index = script.find('"items"')
-    #    end = script.find('productImageAnimationStepTime')
-     #   print script[index:end]
+
+siteMango = urllib2.urlopen('http://shop.mango.com/GB/mango/clothing/dresses')
         
-        
-    
+siteMango = BeautifulSoup.BeautifulSoup(siteMango)
+
+itemsMango = siteMango.find(id='iteradorPrendas')
+
+#print itemsMango.prettify()
+
+for row in itemsMango:
+    for box in row:
+        if box.table: 
+            box = box.table
+            title = box.findAll('span', {'id':re.compile('.*iteradorPrendas:\d+:.*'),'class':'txt7'})[0].text
+            print title
+            print "$$$$$$"
+            
