@@ -14,20 +14,45 @@ for item in itemsZara:
     print "---------"
 
 
-siteMango = urllib2.urlopen('http://shop.mango.com/GB/mango/clothing/dresses')
+siteMango = urllib2.urlopen('http://shop.mango.com/GB/page/mango/clothing/dresses/?n=1')
         
 siteMango = BeautifulSoup.BeautifulSoup(siteMango)
 
-itemsMango = siteMango.find(id='iteradorPrendas')
+print "Mango Dresses \n"
 
-#print itemsMango.prettify()
+pageNum = 1
+while True:
+    itemsMango = siteMango.find(id='iteradorPrendas')
+    
+    for row in itemsMango:
+        for box in row:
+            if box.table: 
+                box = box.table
+                oldPrice = None
+                title = box.findAll('span', {'id':re.compile('.*iteradorPrendas:\d+:.*'),'class':'txt7'})[0].text
+                if (box.findAll('span', {'class':re.compile('txt7'), 'id':None})):
+                    oldPrice = box.findAll('span', {'class':re.compile('txt7'), 'id':None})[0].text
+                newPrice = box.findAll('span', {'class':re.compile('txt8B'), 'id':None})[0].text
+                image = box.findAll('img')[0]
+                print "Product: \n"
+                print "Title " + title
+                print "Image " + image['src']
+                if (oldPrice):
+                    print "Old Price " + oldPrice + "*****" + "New Price " + newPrice + "\n"
+                else:
+                    print "New Price " + newPrice + '\n'
+                print "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ \n"
+                
+    pageNum += 1
+    page = siteMango.findAll('a', {'href':re.compile('GB/page/mango/clothing/dresses/\?n=%d' % pageNum)})
+    if page:
+        page = page[0]
+        newPage = 'http://shop.mango.com/' + page['href']
+        print "Getting a new page:", newPage
+        siteMango = urllib2.urlopen(newPage)
+        siteMango = BeautifulSoup.BeautifulSoup(siteMango)
+        print "Processing page"
+    else:
+        break
 
-for row in itemsMango:
-    for box in row:
-        if box.table: 
-            box = box.table
-            title = box.findAll('span', {'id':re.compile('.*iteradorPrendas:\d+:.*'),'class':'txt7'})[0].text
-            price = box.findAll('span', {'class':re.compile('txt8B|txt7'), 'id':None})
-            print price
-            print "$$$$$$"
-            
+print "Everything done"
